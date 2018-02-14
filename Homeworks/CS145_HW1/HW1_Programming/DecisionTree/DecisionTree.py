@@ -72,19 +72,38 @@ def compute_entropy(data):
     total_entropy = 0.0
     ########## Please Fill Missing Lines Here ##########
 
+    count = Counter(data.label).most_common()
+
+    for i in count:
+        p = i[1] / data.num_instances
+        total_entropy += -p * (np.log(p, 2))
     return total_entropy
     
 
 def compute_info_gain(data, att_idx):
     info_gain = 0.0
     ########## Please Fill Missing Lines Here ##########
-
+    split_data = data.split(att_idx)
+    
+    for x in split_data:
+        info_gain -= (split_data[x].num_instances/data.num_instances) * compute_entropy(split_data[x])
+    
     return info_gain
 
 
 def comput_gain_ratio(data, att_idx):
     gain_ratio = 0.0
     ########## Please Fill Missing Lines Here ##########
+
+    g = 0.0
+    split_data = data.split(att_idx)
+
+    for x in split_data:
+        p = split_data[x].num_instances/data.num_instances
+        g += (-p)*(math.log(p,2))
+    
+    if g != 0.0:
+        gain_ratio = gain_ratio/g
 
     return gain_ratio
 
@@ -110,7 +129,11 @@ class DecisionTree(object):
                 # A leaf to decide the decided class
                 self.m_attr_idx = None
                 ########## Please Fill Missing Lines Here ##########
-
+                count = {}
+                for lbl in self.instances.label:
+                    count[lbl] = count.get(lbl, 0) + 1
+                    
+                self.m_class = max(count,key=count.get)
             else:
                 # A branch
                 split_data = self.instances.split(self.m_attr_idx)
